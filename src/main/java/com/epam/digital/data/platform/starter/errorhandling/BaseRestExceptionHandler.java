@@ -11,10 +11,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 @Slf4j
 @ControllerAdvice
-public class BaseRestExceptionHandler {
+public class BaseRestExceptionHandler extends ResponseEntityExceptionHandler {
 
   public static final String INTERNAL_SERVER_ERROR = "Internal server error";
   public static final String ACCESS_IS_DENIED = "Access is denied";
@@ -60,7 +61,7 @@ public class BaseRestExceptionHandler {
         .message(ex.getMessage())
         .localizedMessage(ex.getLocalizedMessage())
         .build();
-    log.warn("User data validation is not passed", ex);
+    log.warn("Error occurs in internal REST communication", ex);
     return new ResponseEntity<>(error, ex.getHttpStatus());
   }
 }
