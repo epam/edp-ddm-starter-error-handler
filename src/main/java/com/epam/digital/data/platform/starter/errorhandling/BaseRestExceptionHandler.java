@@ -44,7 +44,7 @@ public class BaseRestExceptionHandler extends ResponseEntityExceptionHandler {
   @ExceptionHandler(ValidationException.class)
   public ResponseEntity<ValidationErrorDto> handleValidationException(ValidationException ex) {
     var error = ValidationErrorDto.builder()
-        .traceId(ex.getTraceId())
+        .traceId(MDC.get(TRACE_ID_KEY))
         .code(ex.getCode())
         .message(ex.getMessage())
         .details(ex.getDetails())
