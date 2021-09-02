@@ -56,7 +56,7 @@ public class BaseRestExceptionHandler extends ResponseEntityExceptionHandler {
   @ExceptionHandler(RestSystemException.class)
   public ResponseEntity<SystemErrorDto> handleRestSystemException(RestSystemException ex) {
     var error = SystemErrorDto.builder()
-        .traceId(ex.getTraceId())
+        .traceId(MDC.get(TRACE_ID_KEY))
         .code(ex.getCode())
         .message(ex.getMessage())
         .localizedMessage(ex.getLocalizedMessage())
