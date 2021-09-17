@@ -3,6 +3,7 @@ package com.epam.digital.data.platform.starter.errorhandling;
 import com.epam.digital.data.platform.starter.errorhandling.dto.SystemErrorDto;
 import com.epam.digital.data.platform.starter.errorhandling.dto.ValidationErrorDto;
 import com.epam.digital.data.platform.starter.errorhandling.exception.RestSystemException;
+import com.epam.digital.data.platform.starter.errorhandling.exception.SoapSystemException;
 import com.epam.digital.data.platform.starter.errorhandling.exception.ValidationException;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
@@ -63,5 +64,16 @@ public class BaseRestExceptionHandler extends ResponseEntityExceptionHandler {
         .build();
     log.warn("Error occurs in internal REST communication", ex);
     return new ResponseEntity<>(error, ex.getHttpStatus());
+  }
+
+  @ExceptionHandler(SoapSystemException.class)
+  public ResponseEntity<SystemErrorDto> handleSoapSystemException(SoapSystemException ex) {
+    var error = SystemErrorDto.builder()
+        .traceId(MDC.get(TRACE_ID_KEY))
+        .code(ex.getCode())
+        .message(ex.getMessage())
+        .build();
+    log.warn("Trembita communication error", ex);
+    return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
   }
 }

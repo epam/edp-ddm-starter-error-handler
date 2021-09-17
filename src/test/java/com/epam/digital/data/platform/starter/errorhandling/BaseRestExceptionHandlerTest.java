@@ -8,8 +8,10 @@ import com.epam.digital.data.platform.starter.errorhandling.dto.ErrorsListDto;
 import com.epam.digital.data.platform.starter.errorhandling.dto.SystemErrorDto;
 import com.epam.digital.data.platform.starter.errorhandling.dto.ValidationErrorDto;
 import com.epam.digital.data.platform.starter.errorhandling.exception.RestSystemException;
+import com.epam.digital.data.platform.starter.errorhandling.exception.SoapSystemException;
 import com.epam.digital.data.platform.starter.errorhandling.exception.ValidationException;
 import org.assertj.core.api.Assertions;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -24,25 +26,30 @@ public class BaseRestExceptionHandlerTest {
   @InjectMocks
   private BaseRestExceptionHandler exceptionHandler;
 
+  @Before
+  public void setUp() {
+    MDC.put(BaseRestExceptionHandler.TRACE_ID_KEY, "traceId");
+  }
+
   @Test
   public void handleAccessDeniedException() {
-    MDC.put(BaseRestExceptionHandler.TRACE_ID_KEY, "traceId");
     var response = exceptionHandler
         .handleAccessDeniedException(new AccessDeniedException("Denied"));
 
     assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
-    Assertions.assertThat(response.getBody()).isEqualTo(SystemErrorDto.builder().traceId("traceId").code("403")
-        .message(BaseRestExceptionHandler.ACCESS_IS_DENIED).build());
+    Assertions.assertThat(response.getBody())
+        .isEqualTo(SystemErrorDto.builder().traceId("traceId").code("403")
+            .message(BaseRestExceptionHandler.ACCESS_IS_DENIED).build());
   }
 
   @Test
   public void handleRuntimeException() {
-    MDC.put(BaseRestExceptionHandler.TRACE_ID_KEY, "traceId");
     var response = exceptionHandler.handleRuntimeException(new RuntimeException());
 
     assertThat(response.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
-    Assertions.assertThat(response.getBody()).isEqualTo(SystemErrorDto.builder().traceId("traceId").code("500")
-        .message(BaseRestExceptionHandler.INTERNAL_SERVER_ERROR).build());
+    Assertions.assertThat(response.getBody())
+        .isEqualTo(SystemErrorDto.builder().traceId("traceId").code("500")
+            .message(BaseRestExceptionHandler.INTERNAL_SERVER_ERROR).build());
   }
 
   @Test
@@ -71,4 +78,15 @@ public class BaseRestExceptionHandlerTest {
     Assertions.assertThat(response.getBody()).isEqualTo(errorDto);
   }
 
+  @Test
+  public void handleSoapSystemException() {
+    var errorDto = SystemErrorDto.builder().traceId("traceId")
+        .message("No valid authentication certificate").code("500").build();
+    var soapSystemException = new SoapSystemException(errorDto);
+
+    var response = exceptionHandler.handleSoapSystemException(soapSystemException);
+
+    assertThat(response.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
+    Assertions.assertThat(response.getBody()).isEqualTo(errorDto);
+  }
 }
