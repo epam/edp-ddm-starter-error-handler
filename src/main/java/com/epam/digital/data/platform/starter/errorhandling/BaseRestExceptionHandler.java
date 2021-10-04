@@ -62,7 +62,7 @@ public class BaseRestExceptionHandler extends ResponseEntityExceptionHandler {
         .message(ex.getMessage())
         .localizedMessage(ex.getLocalizedMessage())
         .build();
-    log.warn("Error occurs in internal REST communication", ex);
+    log.error("Error occurs in internal REST communication", ex);
     return new ResponseEntity<>(error, ex.getHttpStatus());
   }
 
@@ -73,7 +73,7 @@ public class BaseRestExceptionHandler extends ResponseEntityExceptionHandler {
         .code(ex.getCode())
         .message(ex.getMessage())
         .build();
-    log.warn("Trembita communication error", ex);
+    log.error("Trembita communication error", ex);
     return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
   }
 }
