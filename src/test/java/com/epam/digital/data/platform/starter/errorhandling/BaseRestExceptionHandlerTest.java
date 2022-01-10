@@ -27,28 +27,28 @@ import com.epam.digital.data.platform.starter.errorhandling.exception.RestSystem
 import com.epam.digital.data.platform.starter.errorhandling.exception.SoapSystemException;
 import com.epam.digital.data.platform.starter.errorhandling.exception.ValidationException;
 import org.assertj.core.api.Assertions;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.slf4j.MDC;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.AccessDeniedException;
 
-@RunWith(MockitoJUnitRunner.class)
-public class BaseRestExceptionHandlerTest {
+@ExtendWith(MockitoExtension.class)
+class BaseRestExceptionHandlerTest {
 
   @InjectMocks
   private BaseRestExceptionHandler exceptionHandler;
 
-  @Before
+  @BeforeEach
   public void setUp() {
     MDC.put(BaseRestExceptionHandler.TRACE_ID_KEY, "traceId");
   }
 
   @Test
-  public void handleAccessDeniedException() {
+  void handleAccessDeniedException() {
     var response = exceptionHandler
         .handleAccessDeniedException(new AccessDeniedException("Denied"));
 
@@ -59,7 +59,7 @@ public class BaseRestExceptionHandlerTest {
   }
 
   @Test
-  public void handleRuntimeException() {
+  void handleRuntimeException() {
     var response = exceptionHandler.handleRuntimeException(new RuntimeException());
 
     assertThat(response.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
@@ -69,7 +69,7 @@ public class BaseRestExceptionHandlerTest {
   }
 
   @Test
-  public void handleValidationException() {
+  void handleValidationException() {
     var validationException = new ValidationException("traceId", "422", "not valid",
         new ErrorsListDto(singletonList(new ErrorDetailDto("message", "field", "value"))));
 
@@ -83,7 +83,7 @@ public class BaseRestExceptionHandlerTest {
   }
 
   @Test
-  public void handleRestSystemException() {
+  void handleRestSystemException() {
     var errorDto = SystemErrorDto.builder().traceId("traceId")
         .message("Not Found").code("404").localizedMessage("Не знайдено").build();
     var restSystemException = new RestSystemException(errorDto, HttpStatus.NOT_FOUND);
@@ -95,7 +95,7 @@ public class BaseRestExceptionHandlerTest {
   }
 
   @Test
-  public void handleSoapSystemException() {
+  void handleSoapSystemException() {
     var errorDto = SystemErrorDto.builder().traceId("traceId")
         .message("No valid authentication certificate").code("500").build();
     var soapSystemException = new SoapSystemException(errorDto);
@@ -106,3 +106,4 @@ public class BaseRestExceptionHandlerTest {
     Assertions.assertThat(response.getBody()).isEqualTo(errorDto);
   }
 }
+
