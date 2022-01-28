@@ -70,8 +70,9 @@ class BaseRestExceptionHandlerTest {
 
   @Test
   void handleValidationException() {
-    var validationException = new ValidationException("traceId", "422", "not valid",
-        new ErrorsListDto(singletonList(new ErrorDetailDto("message", "field", "value"))));
+    var validationException = new ValidationException(
+        new ValidationErrorDto("traceId", "422", "not valid",
+            new ErrorsListDto(singletonList(new ErrorDetailDto("message", "field", "value")))));
 
     var response = exceptionHandler.handleValidationException(validationException);
 

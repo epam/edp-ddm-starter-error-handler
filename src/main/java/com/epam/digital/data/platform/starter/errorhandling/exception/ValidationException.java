@@ -28,14 +28,13 @@ public class ValidationException extends RuntimeException {
 
   private String traceId;
   private String code;
-  private String message;
   private ErrorsListDto details;
 
   public ValidationException(ValidationErrorDto validationErrorDto) {
+    super(Objects.nonNull(validationErrorDto) ? validationErrorDto.getMessage() : null);
     if (Objects.nonNull(validationErrorDto)) {
       this.traceId = validationErrorDto.getTraceId();
       this.code = validationErrorDto.getCode();
-      this.message = validationErrorDto.getMessage();
       this.details = validationErrorDto.getDetails();
     }
   }
